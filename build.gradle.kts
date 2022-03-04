@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 	id("org.springframework.boot") version "2.6.4"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("nu.studer.jooq") version "7.1.1"
 	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
 }
@@ -31,7 +32,12 @@ dependencies {
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
+    jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0-RC3")
+    jooqGenerator("org.jooq:jooq-meta-extensions-liquibase")
+    jooqGenerator("org.liquibase:liquibase-core")
+    jooqGenerator("org.yaml:snakeyaml")
 }
+
 
 dependencyManagement {
 	imports {
@@ -48,4 +54,38 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+jooq {
+    version.set("3.16.4")
+
+    configurations {
+        create("main") {
+            generateSchemaSourceOnCompilation.set(true)
+
+            jooqConfiguration.apply {
+                logging = org.jooq.meta.jaxb.Logging.WARN
+
+                generator.apply {
+                    name = "org.jooq.codegen.KotlinGenerator"
+
+                    target.apply {
+                        packageName = "info.quiquedev.patients.common.domain"
+                    }
+
+                    database.apply {
+                        name = "org.jooq.meta.extensions.liquibase.LiquibaseDatabase"
+                        properties.add(
+                            org.jooq.meta.jaxb.Property().withKey("scripts")
+                                .withValue("src/main/resources/db/changelog/db.changelog-master.yaml")
+                        )
+
+                        properties.add(
+                            org.jooq.meta.jaxb.Property().withKey("includeLiquibaseTables").withValue("false")
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

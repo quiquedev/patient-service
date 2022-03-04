@@ -98,6 +98,8 @@ components:
       description: internal unique id for each patient
       type: string
       format: uuid
+      minLength: 35
+      maxLength: 35
       example: 23e4567-e89b-12d3-a456-426614174000
     DateTime:
       type: string

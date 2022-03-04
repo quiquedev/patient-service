@@ -1,0 +1,39 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Enrique Molina
+      comment: initial state
+      changes:
+        - createTable:
+            tableName: patients
+            columns:
+              - column:
+                  name: id
+                  type: varchar(35)
+                  constraints:
+                    - primaryKey: true
+                    - nullable: false
+              - column:
+                  name: name
+                  type: varchar(50)
+                  constraints:
+                    - nullable: false
+              - column:
+                  name: surname
+                  type: varchar(150)
+                  constraints:
+                    - nullable: false
+              - column:
+                  name: passport_number
+                  type: varchar(10)
+                  constraints:
+                    - nullable: false
+              - column:
+                  name: created_at
+                  type: date
+                  constraints:
+                    - nullable: false
+        - addUniqueConstraint:
+            constraintName: uk_patients_passport_number
+            tableName: patients
+            columnNames: passport_number

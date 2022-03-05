@@ -12,9 +12,24 @@ paths:
         $ref: '#/components/requestBodies/PatientCreationDetails'
       responses:
         200:
-          $ref: '#/components/responses/PatientCreatedDetails'
+          $ref: '#/components/schemas/PatientDetails'
         400:
           $ref: '#/components/responses/ValidationError'
+        500:
+          description: try later or contact us at support@quiquedev.info
+  /patients/{id}:
+    get:
+      summary: get a patient
+      parameters:
+        - in: path
+          name: id
+          schema:
+            $ref: '#/components/schemas/Id'
+      responses:
+        200:
+          $ref: '#/components/schemas/PatientDetails'
+        404:
+          description: patient with given id not found
         500:
           description: try later or contact us at support@quiquedev.info
 components:
@@ -37,29 +52,6 @@ components:
               passportNumber:
                 $ref: '#/components/schemas/PassportNumber'
   responses:
-    PatientCreatedDetails:
-      description: patient information after creation
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-              - id
-              - passportNumber
-              - name
-              - surname
-              - createdAt
-            properties:
-              id:
-                $ref: '#/components/schemas/Id'
-              name:
-                $ref: '#/components/schemas/Name'
-              surname:
-                $ref: '#/components/schemas/Surname'
-              passportNumber:
-                $ref: '#/components/schemas/PassportNumber'
-              createdAt:
-                $ref: '#/components/schemas/DateTime'
     ValidationError:
       description: patient information is not valid
       content:
@@ -78,6 +70,25 @@ components:
                   type: string
                   example: name cannot be blank
   schemas:
+    PatientDetails:
+      type: object
+      required:
+        - id
+        - passportNumber
+        - name
+        - surname
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/Id'
+        name:
+          $ref: '#/components/schemas/Name'
+        surname:
+          $ref: '#/components/schemas/Surname'
+        passportNumber:
+          $ref: '#/components/schemas/PassportNumber'
+        createdAt:
+          $ref: '#/components/schemas/DateTime'
     Name:
       type: string
       maxLength: 50

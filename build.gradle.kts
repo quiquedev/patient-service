@@ -1,11 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "2.6.4"
+	id("org.springframework.boot") version "2.4.2"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("nu.studer.jooq") version "7.1.1"
 	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
+    id("nu.studer.jooq") version "7.1.1"
 }
 
 group = "info.quiquedev"
@@ -26,14 +26,14 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
-	implementation("org.liquibase:liquibase-core")
+	implementation("org.liquibase:liquibase-core:3.8.1")
 	runtimeOnly("mysql:mysql-connector-java")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.testcontainers:junit-jupiter")
 	testImplementation("org.testcontainers:mysql")
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0-RC3")
-    jooqGenerator("org.jooq:jooq-meta-extensions-liquibase")
+    jooqGenerator("org.jooq:jooq-meta-extensions-liquibase:3.15.1")
     jooqGenerator("org.liquibase:liquibase-core")
     jooqGenerator("org.yaml:snakeyaml")
 }

@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  db:
+    image: "mysql:8.0.28"
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=ps_password
+      - MYSQL_DATABASE=patients_service

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 120000
+      idle-timeout: 300000
+      max-lifetime: 840000
+      minimum-idle: 10
+      username: root
+      password: ps_password
+    type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://localhost:3307/patients_service
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.r2dbc.R2dbcAutoConfiguration

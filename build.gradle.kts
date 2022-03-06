@@ -70,7 +70,7 @@ jooq {
                     name = "org.jooq.codegen.KotlinGenerator"
 
                     target.apply {
-                        packageName = "info.quiquedev.patients.common.domain"
+                        packageName = "info.quiquedev.patientsservice.patients.database"
                     }
 
                     database.apply {

@@ -1,11 +1,11 @@
-package info.quiquedev.patientservicekotlin
+package info.quiquedev.patientservice
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class PatientServiceKotlinApplication
+class PatientServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<PatientServiceKotlinApplication>(*args)
+	runApplication<PatientServiceApplication>(*args)
 }

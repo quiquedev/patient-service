@@ -7,11 +7,12 @@ import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import java.time.Clock
 import javax.sql.DataSource
 
 @Configuration
-class DatabaseConfig {
+class PatientsUsecasesConfig {
     @Bean
     fun dsl(
         dataSource: DataSource
@@ -23,4 +24,10 @@ class DatabaseConfig {
 
     @Bean
     fun clock() = Clock.systemUTC()
+
+    @Bean
+    fun patientsUseCases(
+        dslContext: DSLContext,
+        clock: Clock
+    ) = PatientsUseCases(dslContext, clock)
 }

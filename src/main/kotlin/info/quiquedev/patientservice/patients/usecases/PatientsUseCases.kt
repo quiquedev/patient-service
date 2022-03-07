@@ -1,8 +1,5 @@
 package info.quiquedev.patientservice.patients.usecases
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.right
 import info.quiquedev.patientservice.patients.NewPatientDto
 import info.quiquedev.patientservice.patients.PatientDto
 import info.quiquedev.patientservice.patients.ReactorUtils.safeMono

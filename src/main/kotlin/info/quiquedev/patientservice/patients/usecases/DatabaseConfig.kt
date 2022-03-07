@@ -7,6 +7,7 @@ import org.jooq.conf.Settings
 import org.jooq.impl.DSL
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.time.Clock
 import javax.sql.DataSource
 
 @Configuration
@@ -19,4 +20,7 @@ class DatabaseConfig {
         SQLDialect.MYSQL,
         Settings().withRenderNameCase(RenderNameCase.LOWER)
     )
+
+    @Bean
+    fun clock() = Clock.systemUTC()
 }

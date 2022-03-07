@@ -1,4 +1,4 @@
-package info.quiquedev.patientservice.patients.database
+package info.quiquedev.patientservice.patients.usecases
 
 import org.jooq.DSLContext
 import org.jooq.SQLDialect

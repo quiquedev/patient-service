@@ -9,10 +9,10 @@ paths:
     post:
       summary: create a patient in the system
       requestBody:
-        $ref: '#/components/requestBodies/PatientCreationDetails'
+        $ref: '#/components/requestBodies/NewPatient'
       responses:
         200:
-          $ref: '#/components/schemas/PatientDetails'
+          $ref: '#/components/schemas/Patient'
         400:
           $ref: '#/components/responses/ValidationError'
         500:
@@ -27,14 +27,14 @@ paths:
             $ref: '#/components/schemas/Id'
       responses:
         200:
-          $ref: '#/components/schemas/PatientDetails'
+          $ref: '#/components/schemas/Patient'
         404:
           description: patient with given id not found
         500:
           description: try later or contact us at support@quiquedev.info
 components:
   requestBodies:
-    PatientCreationDetails:
+    NewPatient:
       description: patient information
       content:
         application/json:
@@ -70,7 +70,7 @@ components:
                   type: string
                   example: name cannot be blank
   schemas:
-    PatientDetails:
+    Patient:
       type: object
       required:
         - id

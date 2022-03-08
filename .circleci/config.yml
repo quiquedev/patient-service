@@ -3,11 +3,6 @@ machine: true
 
 jobs:
   build:
-    docker:
-      - image: cimg/openjdk:17.0.2
-
-    working_directory: ~/repo
-
     steps:
       - checkout
       - run: gradle test

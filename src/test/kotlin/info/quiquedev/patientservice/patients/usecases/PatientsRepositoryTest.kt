@@ -7,14 +7,17 @@ import org.springframework.boot.autoconfigure.security.oauth2.client.reactive.Re
 import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest(
-    classes = [PatientsUsecasesConfig::class]
+    classes = [
+        PatientsRepositoryConfig::class,
+        FixedClockConfig::class
+    ]
 )
 @EnableAutoConfiguration(
     exclude = [ReactiveOAuth2ClientAutoConfiguration::class]
 )
-class PatientsUseCasesTest: WithDatabaseContainer {
+class PatientsRepositoryTest : WithDatabaseContainer {
     @Autowired
-    lateinit var patientsUseCases: PatientsUseCases
+    lateinit var patientsRepository: PatientsRepository
 
     @Test
     fun t() {

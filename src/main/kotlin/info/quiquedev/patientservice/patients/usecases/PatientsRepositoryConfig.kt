@@ -11,7 +11,7 @@ import java.time.Clock
 import javax.sql.DataSource
 
 @Configuration
-class PatientsUsecasesConfig {
+class PatientsRepositoryConfig {
     @Bean
     fun dsl(
         dataSource: DataSource
@@ -22,11 +22,11 @@ class PatientsUsecasesConfig {
     )
 
     @Bean
-    fun clock() = Clock.systemUTC()
+    fun clock(): Clock = Clock.systemUTC()
 
     @Bean
-    fun patientsUseCases(
+    fun patientsRepository(
         dslContext: DSLContext,
         clock: Clock
-    ) = PatientsUseCases(dslContext, clock)
+    ) = PatientsRepository(dslContext, clock)
 }

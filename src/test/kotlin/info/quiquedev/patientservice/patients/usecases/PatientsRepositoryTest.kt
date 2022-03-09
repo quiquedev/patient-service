@@ -65,7 +65,7 @@ class PatientsRepositoryTest : WithDatabaseContainer {
         StepVerifier
             .create(repository.findPatient(id))
             .expectNextMatches {
-                it.equals(existingPatient.some())
+                it == existingPatient.some()
             }
             .verifyComplete()
     }
@@ -83,12 +83,35 @@ class PatientsRepositoryTest : WithDatabaseContainer {
         existingPatient.store()
 
         StepVerifier
-            .create(repository.createPatient(
-                name = "marcel",
-                surname = "lineal",
-                passportNumber = existingPassportNumber
-            ))
+            .create(
+                repository.createPatient(
+                    name = "marcel",
+                    surname = "lineal",
+                    passportNumber = existingPassportNumber
+                )
+            )
             .expectError(ExistingPassportNumberError::class.java)
             .verify()
+    }
+
+    @Test
+    fun `create patient create a new patient in the db`() {
+        val name = "marcel"
+        val surname = "lineal"
+        val passportNumber = "12345687II"
+
+        StepVerifier
+            .create(
+                repository.createPatient(
+                    name = name,
+                    surname = surname,
+                    passportNumber = passportNumber
+                )
+            )
+            .expectNextMatches {
+                val patients = dsl.selectFrom(PATIENTS).toList()
+                patients.size == 1 && it == patients.first()
+            }
+            .verifyComplete()
     }
 }

@@ -9,7 +9,7 @@ databaseChangeLog:
             columns:
               - column:
                   name: id
-                  type: varchar(35)
+                  type: varchar(36)
                   constraints:
                     - primaryKey: true
                     - nullable: false

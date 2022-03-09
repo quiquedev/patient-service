@@ -65,8 +65,8 @@ class PatientsRepository(
                 }.toCompletableFuture()
             }
             .onErrorMap {
-                when (it) {
-                    is ExistingPassportNumberError -> it
+                when (it.cause) {
+                    is ExistingPassportNumberError -> it.cause
                     else -> UnexpectedError(it)
                 }
             }

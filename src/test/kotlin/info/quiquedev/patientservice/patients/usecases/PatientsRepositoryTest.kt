@@ -2,8 +2,8 @@ package info.quiquedev.patientservice.patients.usecases
 
 import arrow.core.none
 import arrow.core.some
+import info.quiquedev.patientservice.patients.usecases.PatientsRepository.ExistingPassportNumberError
 import info.quiquedev.patientsservice.patients.usecases.tables.references.PATIENTS
-import org.assertj.core.api.Assertions
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,5 +68,27 @@ class PatientsRepositoryTest : WithDatabaseContainer {
                 it.equals(existingPatient.some())
             }
             .verifyComplete()
+    }
+
+    @Test
+    fun `create patient should not be possible if passport number already exists`() {
+        val existingPatient = dsl.newRecord(PATIENTS)
+        val id = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
+        existingPatient.id = id
+        existingPatient.name = "mohammed"
+        existingPatient.surname = "rodriguez"
+        val existingPassportNumber = "12345687II"
+        existingPatient.passportNumber = existingPassportNumber
+        existingPatient.createdAt = LocalDateTime.ofInstant(Instant.now(clock), ZoneId.of("UTC"))
+        existingPatient.store()
+
+        StepVerifier
+            .create(repository.createPatient(
+                name = "marcel",
+                surname = "lineal",
+                passportNumber = existingPassportNumber
+            ))
+            .expectError(ExistingPassportNumberError::class.java)
+            .verify()
     }
 }

@@ -3,8 +3,11 @@ package info.quiquedev.patientservice.patients.usecases
 import arrow.core.Option
 import arrow.core.none
 import arrow.core.some
-import info.quiquedev.patientservice.patients.NewPatientDto
+import info.quiquedev.patientservice.patients.ExistingPassportNumberError
+import info.quiquedev.patientservice.patients.PatientsError
 import info.quiquedev.patientservice.patients.ReactorUtils.safeMono
+import info.quiquedev.patientservice.patients.TooManyPatientsError
+import info.quiquedev.patientservice.patients.UnexpectedError
 import info.quiquedev.patientsservice.patients.usecases.tables.records.PatientsRecord
 import info.quiquedev.patientsservice.patients.usecases.tables.references.PATIENTS
 import org.jooq.DSLContext
@@ -13,22 +16,12 @@ import java.time.Clock
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Optional
 import java.util.UUID
 
 class PatientsRepository(
     private val dsl: DSLContext,
     private val clock: Clock
 ) {
-    sealed class PatientsRepositoryError(message: String, throwable: Throwable? = null) : Throwable(message, throwable)
-    data class ExistingPassportNumberError(val passportNumber: String) :
-        PatientsRepositoryError("existing passport number $passportNumber")
-
-    data class UnexpectedError(val throwable: Throwable) :
-        PatientsRepositoryError("unexpected error", throwable)
-
-    data class TooManyPatientsError(val id: String, val amount: Int) :
-        PatientsRepositoryError("$amount patients found for id $id")
 
     fun findPatient(id: String):
             Mono<Option<PatientsRecord>> =
@@ -49,7 +42,6 @@ class PatientsRepository(
                 else -> UnexpectedError(it)
             }
         }
-
 
     fun createPatient(
         name: String,

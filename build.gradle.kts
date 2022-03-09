@@ -35,6 +35,8 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
+    jooqGenerator("org.slf4j:slf4j-api:2.0.0-alpha6")
+    jooqGenerator("org.slf4j:slf4j-simple:2.0.0-alpha6")
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0-RC3")
     jooqGenerator("org.jooq:jooq-meta-extensions-liquibase")
     jooqGenerator("org.liquibase:liquibase-core")

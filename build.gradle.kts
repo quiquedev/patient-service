@@ -10,7 +10,7 @@ plugins {
 
 group = "info.quiquedev"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_17
+java.sourceCompatibility = JavaVersion.VERSION_16
 
 repositories {
     mavenCentral()
@@ -35,9 +35,8 @@ dependencies {
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:mysql")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
-    testImplementation("org.mockito:mockito-inline:4.0.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:4.0.0")
+    testImplementation("org.mockito:mockito-core:4.4.0")
+    testImplementation("org.mockito:mockito-inline:4.4.0")
     jooqGenerator("org.slf4j:slf4j-api:2.0.0-alpha6")
     jooqGenerator("org.slf4j:slf4j-simple:2.0.0-alpha6")
     jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0-RC3")
@@ -53,10 +52,13 @@ dependencyManagement {
     }
 }
 
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions.freeCompilerArgs += "-Xsam-conversions=class"
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = "17"
+        jvmTarget = "16"
     }
 }
 

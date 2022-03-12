@@ -42,17 +42,17 @@ class PatientsRepositoryTest : WithDatabaseContainer {
     }
 
     @Test
-    fun `find patient should return none if patient cannot be found`() {
+    fun `find patient by id should return none if patient cannot be found`() {
         val id = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
 
         StepVerifier
-            .create(repository.findPatient(id))
+            .create(repository.findPatientById(id))
             .expectNext(none())
             .verifyComplete()
     }
 
     @Test
-    fun `find patient should return some if patient can be found`() {
+    fun `find patient by id should return some if patient can be found`() {
         val existingPatient = dsl.newRecord(PATIENTS)
         val id = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
         existingPatient.id = id
@@ -63,7 +63,7 @@ class PatientsRepositoryTest : WithDatabaseContainer {
         existingPatient.store()
 
         StepVerifier
-            .create(repository.findPatient(id))
+            .create(repository.findPatientById(id))
             .expectNextMatches {
                 it == existingPatient.some()
             }

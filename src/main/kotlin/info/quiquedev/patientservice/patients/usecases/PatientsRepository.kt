@@ -23,7 +23,7 @@ class PatientsRepository(
     private val clock: Clock
 ) {
 
-    fun findPatient(id: String):
+    fun findPatientById(id: String):
             Mono<Option<PatientsRecord>> =
         safeMono {
             val patients = dsl

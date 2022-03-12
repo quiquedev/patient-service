@@ -9,18 +9,8 @@ import info.quiquedev.patientservice.patients.NewPatientDto
 import info.quiquedev.patientservice.patients.PatientDto
 import info.quiquedev.patientservice.patients.ReactorUtils.safeMono
 import info.quiquedev.patientsservice.patients.usecases.tables.records.PatientsRecord
-import info.quiquedev.patientsservice.patients.usecases.tables.references.PATIENTS
-import org.jooq.DSLContext
 import reactor.core.publisher.Mono
-import java.time.Clock
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZoneOffset.UTC
-import java.util.Optional
-import java.util.UUID
-import java.util.concurrent.CompletionStage
 
 class PatientsUseCases(
     private val repository: PatientsRepository
@@ -46,8 +36,8 @@ class PatientsUseCases(
             )
         }.onErrorMap(::UnexpectedError)
 
-    fun findPatient(id: String): Mono<Option<PatientDto>> =
-        repository.findPatient(id)
+    fun findPatientById(id: String): Mono<Option<PatientDto>> =
+        repository.findPatientById(id)
             .flatMap { maybePatientsRecord ->
                 when (maybePatientsRecord) {
                     None -> Mono.just(none())

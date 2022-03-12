@@ -1,22 +1,24 @@
 package info.quiquedev.patientservice.patients.usecases
 
+import arrow.core.none
+import arrow.core.some
 import info.quiquedev.patientservice.patients.ExistingPassportNumberError
 import info.quiquedev.patientservice.patients.NewPatientDto
 import info.quiquedev.patientservice.patients.PatientDto
+import info.quiquedev.patientservice.patients.TooManyPatientsError
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.NEW_PATIENT_DTO
-import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.NEW_PATIENT_RECORD
+import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_RECORD
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_DTO
+import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_ID
 import info.quiquedev.patientsservice.patients.usecases.tables.references.PATIENTS
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.time.Instant
 import java.time.Instant.now
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -62,7 +64,7 @@ class PatientsUseCasesTest {
             )
         )
             .thenReturn(
-                Mono.just(NEW_PATIENT_RECORD)
+                Mono.just(PATIENT_RECORD)
             )
 
         StepVerifier
@@ -71,8 +73,61 @@ class PatientsUseCasesTest {
             .verifyComplete()
     }
 
+    @Test
+    fun `find patient by id should return none if patient cannot be found`() {
+        `when`(
+            repository.findPatientById(
+                PATIENT_ID
+            )
+        )
+            .thenReturn(
+                Mono.just(none())
+            )
+
+        StepVerifier
+            .create(useCases.findPatientById(PATIENT_ID))
+            .expectNext(none())
+            .verifyComplete()
+    }
+
+    @Test
+    fun `find patient by id should raise error there is some accessing database`() {
+        `when`(
+            repository.findPatientById(
+                PATIENT_ID
+            )
+        )
+            .thenReturn(
+                Mono.error(TooManyPatientsError(PATIENT_ID, 2))
+            )
+
+        StepVerifier
+            .create(useCases.findPatientById(PATIENT_ID))
+            .expectError(TooManyPatientsError::class.java)
+            .verify()
+    }
+
+    @Test
+    fun `find patient by id should return some patient if it is found`() {
+        `when`(
+            repository.findPatientById(
+                PATIENT_ID
+            )
+        )
+            .thenReturn(
+                Mono.just(PATIENT_RECORD.some())
+            )
+
+        StepVerifier
+            .create(useCases.findPatientById(PATIENT_ID))
+            .expectNext(PATIENT_DTO.some())
+            .verifyComplete()
+    }
+
 
     object TestValues {
+        val PATIENT_ID = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
+
         val NEW_PATIENT_DTO = NewPatientDto(
             name = "marcel",
             surname = "lineal",
@@ -80,16 +135,16 @@ class PatientsUseCasesTest {
         )
 
         val PATIENT_DTO = PatientDto(
-            id = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17",
+            id = PATIENT_ID,
             name = NEW_PATIENT_DTO.name,
             surname = NEW_PATIENT_DTO.surname,
             passportNumber = NEW_PATIENT_DTO.passportNumber,
             createdAt = now(FIXED_CLOCK)
         )
 
-        val NEW_PATIENT_RECORD = let {
+        val PATIENT_RECORD = let {
             val record = TEST_DSL.newRecord(PATIENTS)
-            record.id = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
+            record.id = PATIENT_ID
             record.name = PATIENT_DTO.name
             record.surname = PATIENT_DTO.surname
             record.passportNumber = PATIENT_DTO.passportNumber

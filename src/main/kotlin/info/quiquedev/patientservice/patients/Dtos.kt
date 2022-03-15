@@ -31,3 +31,8 @@ data class PatientDto(
     val passportNumber: String,
     val createdAt: Instant
 )
+
+data class RestErrorDto(
+    val message: String,
+    val errors: Set<String>? = null
+)

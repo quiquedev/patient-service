@@ -126,7 +126,7 @@ class PatientsUseCasesTest {
 
 
     object TestValues {
-        val PATIENT_ID = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
+        const val PATIENT_ID = "91ecd50b-b035-46f2-9ba7-8ce99ae33e17"
 
         val NEW_PATIENT_DTO = NewPatientDto(
             name = "marcel",

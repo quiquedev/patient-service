@@ -23,6 +23,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    runtimeOnly("com.fasterxml.jackson.module:jackson-modules-java8:2.13.2")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("io.arrow-kt:arrow-core:1.0.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect")

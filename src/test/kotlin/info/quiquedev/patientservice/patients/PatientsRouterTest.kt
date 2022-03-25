@@ -1,5 +1,6 @@
 package info.quiquedev.patientservice.patients
 
+import info.quiquedev.patientservice.patients.usecases.FIXED_CLOCK
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCases
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters.fromValue
 import reactor.core.publisher.Mono
+import java.time.Instant.now
 
 
 @ExtendWith(MockitoExtension::class)
@@ -106,6 +108,27 @@ class PatientsRouterTest {
         request.expectStatus().isBadRequest
     }
 
+    @Test
+    fun `create patients should return 200 and patient created`() {
+        // given
+        val client = WebTestClient.bindToRouterFunction(router.createPatient())
+            .build()
+        `when`(useCases.createPatient(NEW_PATIENT_DTO)).thenReturn(
+            Mono.just(PATIENT_DTO)
+        )
+
+        // when
+        val request = client
+            .post()
+            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .contentType(APPLICATION_JSON)
+            .body(fromValue(NEW_PATIENT_JSON))
+            .exchange()
+
+        // then
+        request.expectStatus().isCreated
+        request.expectBody().json(PATIENT_JSON)
+    }
 
     companion object {
         const val CREATE_PATIENTS_URI = "/patients"
@@ -114,10 +137,27 @@ class PatientsRouterTest {
             surname = "smith",
             passportNumber = "123456789X"
         )
+
         val NEW_PATIENT_JSON = """{
             |"name":"${NEW_PATIENT_DTO.name}",
             |"surname":"${NEW_PATIENT_DTO.surname}",
             |"passportNumber":"${NEW_PATIENT_DTO.passportNumber}"
+            |}""".trimMargin()
+
+        val PATIENT_DTO = PatientDto(
+            id = "81e239d5-dd9d-4891-ae19-c00a37b64d8f",
+            name = NEW_PATIENT_DTO.name,
+            surname = NEW_PATIENT_DTO.surname,
+            passportNumber = NEW_PATIENT_DTO.passportNumber,
+            createdAt = now(FIXED_CLOCK)
+        )
+
+        val PATIENT_JSON = """{
+            |"id":"${PATIENT_DTO.id}",
+            |"name":"${PATIENT_DTO.name}",
+            |"surname":"${PATIENT_DTO.surname}",
+            |"passportNumber":"${PATIENT_DTO.passportNumber}",
+            |"createdAt":"${PATIENT_DTO.createdAt}"
             |}""".trimMargin()
     }
 

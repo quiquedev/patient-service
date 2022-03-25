@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.ServerResponse.created
 import org.springframework.web.reactive.function.server.ServerResponse.notFound
 import org.springframework.web.reactive.function.server.ServerResponse.ok
 import org.springframework.web.reactive.function.server.ServerResponse.status
 import reactor.core.publisher.Mono
+import java.net.URI
 import javax.validation.ConstraintViolation
 import javax.validation.Validation
 import javax.validation.Validator
@@ -21,7 +23,7 @@ class PatientsHandler(
         parseBody(serverRequest)
             .flatMap(::validate)
             .flatMap(useCases::createPatient)
-            .flatMap { ok().bodyValue(it) }
+            .flatMap { created(URI.create("/patients/${it.id}")).bodyValue(it) }
             .onErrorResume(::handlePatientCreationError)
 
     fun handleFindPatientById(serverRequest: ServerRequest): Mono<ServerResponse> =
@@ -34,6 +36,7 @@ class PatientsHandler(
 
     private companion object {
         const val PATH_VARIABLE_ID = "id"
+
 
         class ValidationError(val errors: Set<String>) : Throwable()
         class ParseError(t: Throwable, override val message: String = "request body cannot be parsed") :

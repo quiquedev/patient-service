@@ -1,5 +1,6 @@
 package info.quiquedev.patientservice.patients
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import org.hibernate.validator.constraints.Length
 import java.time.Instant
 
@@ -29,6 +30,7 @@ data class PatientDto(
     val name: String,
     val surname: String,
     val passportNumber: String,
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     val createdAt: Instant
 )
 

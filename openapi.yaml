@@ -11,7 +11,7 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/NewPatient'
       responses:
-        200:
+        201:
           $ref: '#/components/schemas/Patient'
         400:
           $ref: '#/components/responses/ValidationError'

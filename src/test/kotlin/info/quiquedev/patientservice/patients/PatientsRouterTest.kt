@@ -6,15 +6,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.web.reactive.function.BodyInserter
-import org.springframework.web.reactive.function.BodyInserters
 import org.springframework.web.reactive.function.BodyInserters.fromValue
 import reactor.core.publisher.Mono
 
@@ -34,25 +29,6 @@ class PatientsRouterTest {
         router = PatientsRouter(handler)
     }
 
-    //    @Test
-//    fun `should return OK if create events for old payin requests without payin successfully`() {
-//        // given
-//        val logIds = LogIds(
-//            flow = "create-events-for-old-payin-requests-without-payin"
-//        )
-//        val client = WebTestClient.bindToRouterFunction(router.createEventsForOldPayinRequestsWithoutPayin())
-//            .build()
-//
-//        Mockito.`when`(useCases.createEventsForOldPayinRequestsWithoutPayin(logIds)).thenReturn(Mono.just(Unit))
-//
-//        // when
-//        val request = client.post().uri { it.path(CREATE_EVENTS_FOR_OLD_PAYIN_REQUESTS_PATH).build() }
-//        val response = request.exchange()
-//
-//        // then
-//        response.expectStatus().isEqualTo(HttpStatus.OK)
-//        Mockito.verify(useCases).createEventsForOldPayinRequestsWithoutPayin(logIds)
-//    }
     @Test
     fun `create patients should return 400 if body cannot be parsed`() {
         // given
@@ -70,6 +46,39 @@ class PatientsRouterTest {
 
         // then
         request.expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `create patients should return 400 if body validation fails`() {
+        // given
+        val invalidBodyJson = """{
+            |"name":"${"A".repeat(51)}",
+            |"surname":"",
+            |"passportNumber":"11"
+            |}""".trimMargin()
+        val client = WebTestClient.bindToRouterFunction(router.createPatient())
+            .build()
+
+        // when
+        val request = client
+            .post()
+            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .contentType(APPLICATION_JSON)
+            .body(fromValue(invalidBodyJson))
+            .exchange()
+
+        // then
+        request.expectStatus().isBadRequest
+        request.expectBody().json(
+            """{
+            |"message":"request body is not valid",
+            |"errors":[
+            |"'name' length must be between 1 and 50",
+            |"'surname' length must be between 1 and 150",
+            |"'passportNumber' length must be between 10 and 10"
+            |]
+            |}""".trimMargin()
+        )
     }
 
     @Test
@@ -96,6 +105,7 @@ class PatientsRouterTest {
         // then
         request.expectStatus().isBadRequest
     }
+
 
     companion object {
         const val CREATE_PATIENTS_URI = "/patients"

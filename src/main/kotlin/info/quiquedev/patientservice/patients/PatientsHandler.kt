@@ -43,9 +43,6 @@ class PatientsHandler(
         class ParseError(t: Throwable, override val message: String = "request body cannot be parsed") :
             Throwable(t)
 
-        class PathVariableError(val name: String, t: Throwable) :
-            Throwable("path variable $name could not be extracted", t)
-
         val VALIDATOR: Validator = Validation.buildDefaultValidatorFactory().validator
         fun parseBody(serverRequest: ServerRequest): Mono<NewPatientDto> =
             serverRequest.bodyToMono(NewPatientDto::class.java)

@@ -11,11 +11,9 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
-import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.reactive.function.BodyInserters.fromValue
 import reactor.core.publisher.Mono
 import java.time.Instant.now
@@ -44,7 +42,7 @@ class PatientsRouterTest {
             .build()
 
         // when
-        val request = client
+        val response = client
             .post()
             .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
@@ -52,7 +50,7 @@ class PatientsRouterTest {
             .exchange()
 
         // then
-        request.expectStatus().isBadRequest
+        response.expectStatus().isBadRequest
     }
 
     @Test
@@ -67,7 +65,7 @@ class PatientsRouterTest {
             .build()
 
         // when
-        val request = client
+        val response = client
             .post()
             .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
@@ -75,8 +73,8 @@ class PatientsRouterTest {
             .exchange()
 
         // then
-        request.expectStatus().isBadRequest
-        request.expectBody().json(
+        response.expectStatus().isBadRequest
+        response.expectBody().json(
             """{
             |"message":"request body is not valid",
             |"errors":[
@@ -102,7 +100,7 @@ class PatientsRouterTest {
         )
 
         // when
-        val request = client
+        val response = client
             .post()
             .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
@@ -110,7 +108,7 @@ class PatientsRouterTest {
             .exchange()
 
         // then
-        request.expectStatus().isBadRequest
+        response.expectStatus().isBadRequest
     }
 
     @Test
@@ -123,7 +121,7 @@ class PatientsRouterTest {
         )
 
         // when
-        val request = client
+        val response = client
             .post()
             .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
@@ -131,7 +129,7 @@ class PatientsRouterTest {
             .exchange()
 
         // then
-        request.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
+        response.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
     }
 
     @Test
@@ -144,7 +142,7 @@ class PatientsRouterTest {
         )
 
         // when
-        val request = client
+        val response = client
             .post()
             .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
@@ -152,8 +150,8 @@ class PatientsRouterTest {
             .exchange()
 
         // then
-        request.expectStatus().isCreated
-        request.expectBody().json(PATIENT_JSON)
+        response.expectStatus().isCreated
+        response.expectBody().json(PATIENT_JSON)
     }
 
     @Test
@@ -164,13 +162,13 @@ class PatientsRouterTest {
         `when`(useCases.findPatientById(ID)).thenReturn(Mono.just(none()))
 
         // when
-        val request = client
+        val response = client
             .get()
             .uri { it.path("$PATIENTS_URI/$ID").build() }
             .exchange()
 
         // then
-        request.expectStatus().isNotFound
+        response.expectStatus().isNotFound
     }
 
     @Test
@@ -182,13 +180,13 @@ class PatientsRouterTest {
             .thenReturn(Mono.error(IllegalArgumentException()))
 
         // when
-        val request = client
+        val response = client
             .get()
             .uri { it.path("$PATIENTS_URI/$ID").build() }
             .exchange()
 
         // then
-        request.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
+        response.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
     }
 
     @Test
@@ -200,17 +198,17 @@ class PatientsRouterTest {
             .thenReturn(Mono.just(PATIENT_DTO.some()))
 
         // when
-        val request = client
+        val response = client
             .get()
             .uri { it.path("$PATIENTS_URI/$ID").build() }
             .exchange()
 
         // then
-        request.expectStatus().isOk
+        response.expectStatus().isOk
             .expectBody().json(PATIENT_JSON)
     }
 
-    companion object {
+    private companion object {
         const val PATIENTS_URI = "/patients"
         val NEW_PATIENT_DTO = NewPatientDto(
             name = "alim",

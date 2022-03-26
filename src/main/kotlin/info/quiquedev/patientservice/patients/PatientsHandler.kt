@@ -69,10 +69,7 @@ class PatientsHandler(
                 is ExistingPassportNumberError -> {
                     status(BAD_REQUEST)
                         .bodyValue(
-                            RestErrorDto(
-                                "existing passport number '${t.passportNumber}'",
-                                t.cause?.message?.let { setOf(it) }
-                            )
+                            RestErrorDto("existing passport number '${t.passportNumber}'")
                         )
                 }
                 is ValidationError -> {

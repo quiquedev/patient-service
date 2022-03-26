@@ -32,11 +32,12 @@ class PatientsHandler(
             .flatMap { maybePatient ->
                 maybePatient.fold({ notFound().build() }, { ok().bodyValue(it) })
             }
-            .onErrorResume(::handleFindPatientByIdError)
+            .onErrorResume {
+                status(INTERNAL_SERVER_ERROR).build()
+            }
 
     private companion object {
         const val PATH_VARIABLE_ID = "id"
-
 
         class ValidationError(val errors: Set<String>) : Throwable()
         class ParseError(t: Throwable, override val message: String = "request body cannot be parsed") :
@@ -89,34 +90,9 @@ class PatientsHandler(
                 else -> status(INTERNAL_SERVER_ERROR).build()
             }
 
-        fun handleFindPatientByIdError(t: Throwable): Mono<ServerResponse> =
-            when (t) {
-                is PathVariableError -> {
-                    status(BAD_REQUEST)
-                        .bodyValue(
-                            RestErrorDto(
-                                "could not extract path pariable '${t.name}'",
-                                t.cause?.message?.let { setOf(it) }
-                            )
-                        )
-                }
-                is ValidationError -> {
-                    status(BAD_REQUEST)
-                        .bodyValue(
-                            RestErrorDto(
-                                message = "request body is not valid",
-                                errors = t.errors
-                            )
-                        )
-                }
-                else -> status(INTERNAL_SERVER_ERROR).build()
-            }
-
         fun extractPatientId(serverRequest: ServerRequest) =
             safeMono {
                 serverRequest.pathVariable(PATH_VARIABLE_ID)
-            }.onErrorMap {
-                PathVariableError(PATH_VARIABLE_ID, it)
             }
     }
 }

@@ -1,5 +1,7 @@
 package info.quiquedev.patientservice.patients
 
+import arrow.core.none
+import arrow.core.some
 import info.quiquedev.patientservice.patients.usecases.FIXED_CLOCK
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCases
 import org.junit.jupiter.api.BeforeEach
@@ -9,8 +11,11 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.reactive.server.expectBody
 import org.springframework.web.reactive.function.BodyInserters.fromValue
 import reactor.core.publisher.Mono
 import java.time.Instant.now
@@ -41,7 +46,7 @@ class PatientsRouterTest {
         // when
         val request = client
             .post()
-            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
             .body(fromValue(body))
             .exchange()
@@ -64,7 +69,7 @@ class PatientsRouterTest {
         // when
         val request = client
             .post()
-            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
             .body(fromValue(invalidBodyJson))
             .exchange()
@@ -99,7 +104,7 @@ class PatientsRouterTest {
         // when
         val request = client
             .post()
-            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
             .body(fromValue(NEW_PATIENT_JSON))
             .exchange()
@@ -109,7 +114,28 @@ class PatientsRouterTest {
     }
 
     @Test
-    fun `create patients should return 200 and patient created`() {
+    fun `create patients should return 500 something unexpected happens`() {
+        // given
+        val client = WebTestClient.bindToRouterFunction(router.createPatient())
+            .build()
+        `when`(useCases.createPatient(NEW_PATIENT_DTO)).thenReturn(
+            Mono.error(IllegalArgumentException())
+        )
+
+        // when
+        val request = client
+            .post()
+            .uri { it.path(PATIENTS_URI).build() }
+            .contentType(APPLICATION_JSON)
+            .body(fromValue(NEW_PATIENT_JSON))
+            .exchange()
+
+        // then
+        request.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
+    }
+
+    @Test
+    fun `create patients should return 201 and patient created`() {
         // given
         val client = WebTestClient.bindToRouterFunction(router.createPatient())
             .build()
@@ -120,7 +146,7 @@ class PatientsRouterTest {
         // when
         val request = client
             .post()
-            .uri { it.path(CREATE_PATIENTS_URI).build() }
+            .uri { it.path(PATIENTS_URI).build() }
             .contentType(APPLICATION_JSON)
             .body(fromValue(NEW_PATIENT_JSON))
             .exchange()
@@ -130,8 +156,62 @@ class PatientsRouterTest {
         request.expectBody().json(PATIENT_JSON)
     }
 
+    @Test
+    fun `find patient by id should return 404 if patient cannot be found`() {
+        // given
+        val client = WebTestClient.bindToRouterFunction(router.findPatientById())
+            .build()
+        `when`(useCases.findPatientById(ID)).thenReturn(Mono.just(none()))
+
+        // when
+        val request = client
+            .get()
+            .uri { it.path("$PATIENTS_URI/$ID").build() }
+            .exchange()
+
+        // then
+        request.expectStatus().isNotFound
+    }
+
+    @Test
+    fun `find patient by id should return 500 something unexpected happens`() {
+        // given
+        val client = WebTestClient.bindToRouterFunction(router.findPatientById())
+            .build()
+        `when`(useCases.findPatientById(ID))
+            .thenReturn(Mono.error(IllegalArgumentException()))
+
+        // when
+        val request = client
+            .get()
+            .uri { it.path("$PATIENTS_URI/$ID").build() }
+            .exchange()
+
+        // then
+        request.expectStatus().isEqualTo(INTERNAL_SERVER_ERROR)
+    }
+
+    @Test
+    fun `find patient by id should return patient if it is found`() {
+        // given
+        val client = WebTestClient.bindToRouterFunction(router.findPatientById())
+            .build()
+        `when`(useCases.findPatientById(ID))
+            .thenReturn(Mono.just(PATIENT_DTO.some()))
+
+        // when
+        val request = client
+            .get()
+            .uri { it.path("$PATIENTS_URI/$ID").build() }
+            .exchange()
+
+        // then
+        request.expectStatus().isOk
+            .expectBody().json(PATIENT_JSON)
+    }
+
     companion object {
-        const val CREATE_PATIENTS_URI = "/patients"
+        const val PATIENTS_URI = "/patients"
         val NEW_PATIENT_DTO = NewPatientDto(
             name = "alim",
             surname = "smith",
@@ -144,8 +224,10 @@ class PatientsRouterTest {
             |"passportNumber":"${NEW_PATIENT_DTO.passportNumber}"
             |}""".trimMargin()
 
+        const val ID = "81e239d5-dd9d-4891-ae19-c00a37b64d8f"
+
         val PATIENT_DTO = PatientDto(
-            id = "81e239d5-dd9d-4891-ae19-c00a37b64d8f",
+            id = ID,
             name = NEW_PATIENT_DTO.name,
             surname = NEW_PATIENT_DTO.surname,
             passportNumber = NEW_PATIENT_DTO.passportNumber,
@@ -160,5 +242,4 @@ class PatientsRouterTest {
             |"createdAt":"${PATIENT_DTO.createdAt}"
             |}""".trimMargin()
     }
-
 }

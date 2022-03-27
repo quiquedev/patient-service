@@ -3,4 +3,4 @@ create-local-env:
 destroy-local-env:
 	docker-compose down
 run:
-	mvn spring-boot:run -Dspring-boot.run.profiles=local
+	./gradlew bootRun

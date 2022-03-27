@@ -110,6 +110,87 @@ class PatientServiceIntegrationTests : WithDatabaseContainer {
         response.expectBody().json("""{"message": "existing passport number '$PASSPORT_NUMBER'"}""")
     }
 
+    @Test
+    fun `patient cannot be found by id because it does not exist`() {
+        // given
+        assertThat(dsl.selectFrom(PATIENTS).toList()).isEmpty()
+
+        // when
+        val response = client
+            .get()
+            .uri { it.path("$PATIENTS_URI/id-1").build() }
+            .exchange()
+
+        // then
+        response.expectStatus().isNotFound
+    }
+
+    @Test
+    fun `patient cannot be created because request body is not valid`() {
+        // given
+        assertThat(dsl.selectFrom(PATIENTS).toList()).isEmpty()
+        val invalidBodyJson = """{
+            |"name":"${"A".repeat(51)}",
+            |"surname":"",
+            |"passportNumber":"11"
+            |}""".trimMargin()
+
+        // when
+        val response = client
+            .post()
+            .uri { it.path(PATIENTS_URI).build() }
+            .contentType(APPLICATION_JSON)
+            .body(fromValue(invalidBodyJson))
+            .exchange()
+
+        // then
+        response.expectStatus().isBadRequest
+        response.expectBody().json(
+            """{
+            |"message":"request body is not valid",
+            |"errors":[
+            |"'name' length must be between 1 and 50",
+            |"'surname' length must be between 1 and 150",
+            |"'passportNumber' length must be between 10 and 10"
+            |]
+            |}""".trimMargin()
+        )
+    }
+
+    @Test
+    fun `patient is found by id`() {
+        // given
+        val patientRecord = dsl.newRecord(PATIENTS)
+
+        patientRecord.id = "373e48f0-f864-4f01-a45d-b81ff653662a"
+        patientRecord.name = NAME
+        patientRecord.surname = SURNAME
+        patientRecord.passportNumber = PASSPORT_NUMBER
+        patientRecord.createdAt = CREATED_AT
+
+        patientRecord.store()
+
+        // when
+        val response = client
+            .get()
+            .uri { it.path("$PATIENTS_URI/${patientRecord.id}").build() }
+            .exchange()
+
+        // then
+        response.expectStatus().isOk
+        response.expectBody()
+            .jsonPath("$.id")
+            .value(equalTo(patientRecord.id))
+            .jsonPath("$.name")
+            .value(equalTo(patientRecord.name))
+            .jsonPath("$.surname")
+            .value(equalTo(patientRecord.surname))
+            .jsonPath("$.passportNumber")
+            .value(equalTo(patientRecord.passportNumber))
+            .jsonPath("$.createdAt")
+            .value(equalTo(now(clock).toString()))
+    }
+
     private companion object {
         const val PATIENTS_URI = "/patients"
         const val NAME = "mola"

@@ -7,9 +7,9 @@ import info.quiquedev.patientservice.patients.NewPatientDto
 import info.quiquedev.patientservice.patients.PatientDto
 import info.quiquedev.patientservice.patients.TooManyPatientsError
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.NEW_PATIENT_DTO
-import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_RECORD
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_DTO
 import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_ID
+import info.quiquedev.patientservice.patients.usecases.PatientsUseCasesTest.TestValues.PATIENT_RECORD
 import info.quiquedev.patientsservice.patients.usecases.tables.references.PATIENTS
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

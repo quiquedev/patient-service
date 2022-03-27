@@ -1,6 +1,9 @@
 package info.quiquedev.patientservice.patients
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import org.hibernate.validator.constraints.Length
 import java.time.Instant
 
@@ -30,11 +33,13 @@ data class PatientDto(
     val name: String,
     val surname: String,
     val passportNumber: String,
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @JsonFormat(shape = STRING)
     val createdAt: Instant
 )
 
 data class RestErrorDto(
     val message: String,
+
+    @JsonInclude(NON_NULL)
     val errors: Set<String>? = null
 )

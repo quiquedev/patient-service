@@ -4,7 +4,6 @@ import arrow.core.Option
 import arrow.core.none
 import arrow.core.some
 import info.quiquedev.patientservice.patients.ExistingPassportNumberError
-import info.quiquedev.patientservice.patients.PatientsError
 import info.quiquedev.patientservice.patients.ReactorUtils.safeMono
 import info.quiquedev.patientservice.patients.TooManyPatientsError
 import info.quiquedev.patientservice.patients.UnexpectedError

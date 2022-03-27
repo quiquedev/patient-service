@@ -47,17 +47,14 @@ class PatientsRepository(
         surname: String,
         passportNumber: String
     ): Mono<PatientsRecord> =
-        Mono
-            .fromFuture {
-                dsl.transactionResultAsync {
-                    if (existsPassportNumber(passportNumber))
-                        throw ExistingPassportNumberError(passportNumber)
-                    storeNewPatient(name, surname, passportNumber)
-                }.toCompletableFuture()
-            }
+        safeMono {
+            if (existsPassportNumber(passportNumber))
+                throw ExistingPassportNumberError(passportNumber)
+            storeNewPatient(name, surname, passportNumber)
+        }
             .onErrorMap {
-                when (it.cause) {
-                    is ExistingPassportNumberError -> it.cause
+                when (it) {
+                    is ExistingPassportNumberError -> it
                     else -> UnexpectedError(it)
                 }
             }

@@ -4,7 +4,7 @@ The purpose of the code found in this repository is to get to know a bit about m
 a specific solution to a problem since there are not requirements.
 
 ## About
-The simple implementation of a very simple REST api specified [here](openapi.yaml) by using Spring Boot, Kotlin and 
+The simple implementation of a very simple REST api specified [here](openapi.yaml) by using Spring Boot, Kotlin, Java 16 and 
 [jOOQ](https://www.jooq.org) in a functional way with the help of 
 [Spring Webflux](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html).
 [Testcontainers](https://www.testcontainers.org) are used for dockerized test suites.

@@ -22,6 +22,7 @@ paths:
       summary: get a patient
       parameters:
         - in: path
+          required: true
           name: id
           schema:
             $ref: '#/components/schemas/Id'
